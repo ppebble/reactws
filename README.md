@@ -1,4 +1,5 @@
-# Nexmore ERP 고도화 
+# Nex-erp WebSocket
+
 - React 18+
 - Node 20.11.+
 - ES6 & TypeScript 5.3.+
@@ -7,18 +8,20 @@
 - pnpm (Package Manager)
 - Vite (Bundling)
 
-
 ## install pnpm
+
 ```bash
 npm install -g pnpm
 ```
 
 ## install package
+
 ```bash
 pnpm install
 ```
 
 ## start
+
 ```bash
 pnpm run dev
 ```
