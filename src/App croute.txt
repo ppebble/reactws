@@ -1,0 +1,61 @@
+/* eslint-disable react/no-array-index-key */
+import { useEffect } from 'react';
+// import './css/App.css';
+import useDogStore, { setInfoSlice, setWebSocket } from './store/baseParams/baseParams';
+import { RootState, useAppDispatch, useAppSelector } from './store/redux/store';
+import TestChart from './components/TestChart';
+import { SocketState, useWebSocket } from './client';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Route } from './routes/Route';
+import Board from './components/Board';
+import Link from './routes/Link';
+
+const App = () => {
+	const useStore = useDogStore();
+	const state = useAppSelector((infoState: RootState) => infoState.ws);
+	const dispatch = useAppDispatch();
+	const { responseMessage, wsState, webSocket } = useWebSocket((socketState) => {
+		if (socketState === SocketState.onNewMsgReceivced) {
+			console.log('onNewMessageReceived');
+		} else if (socketState === SocketState.onConnectionFailed) {
+			console.log('onConnectionFailed');
+		} else if (socketState === SocketState.onConnectionOpened) {
+			console.log('onConnectionOpened');
+		}
+	}, `ws://192.168.0.212:9000/api/socket`);
+	// }, `ws://localhost:8080/api/socket`);
+	useEffect(() => {
+		if (responseMessage !== '') {
+			useStore.setInfo(responseMessage);
+			dispatch(setInfoSlice(responseMessage));
+			// socket 저장 .. sessionStorage :: { }
+			useStore.setSocket(webSocket.current);
+			dispatch(setWebSocket(webSocket.current));
+			console.log(`ws JSON before setWs ::: ${JSON.stringify(useStore.ws)}`);
+
+			// sessionStorage.setItem('ws', JSON.stringify(webSocket?.OPEN));
+			useStore.setSocketOpenState(webSocket?.current?.OPEN);
+		}
+	}, [responseMessage]);
+	useEffect(() => {
+		console.log(`create Web Socket ${state.ws} 123457`);
+	}, []);
+	const clickSendEvent = () => {
+		console.log(wsState);
+		// console.log(`ws JSON on Click Event ::: ${JSON.stringify(useStore.ws)}`);
+		// console.log(`ws on Click Event ::: ${useStore.ws}`);
+		state.ws?.send('info');
+	};
+	return (
+		<>
+			<Link href="/board">h1</Link>
+			<Route path="/board">
+				<Board />
+			</Route>
+
+			<h1>Child</h1>
+			{/* <TestChart ws={useStore.ws} /> */}
+		</>
+	);
+};
+export default App;
